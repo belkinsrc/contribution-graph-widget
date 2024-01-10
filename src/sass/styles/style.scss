@@ -1,5 +1,7 @@
 .graph {
   position: relative;
+  min-width: 865px;
+  min-height: 117px;
 
   &__activity {
     display: grid;
@@ -7,10 +9,32 @@
     gap: 2px;
   }
 
+  &__week {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
   &__square {
     width: 15px;
     height: 15px;
-    background-color: $level0;
+    background-color: var(--level0);
+    cursor: default;
+
+    &--selected {
+      position: relative;
+      border: 1px solid rgba(0, 0, 0, 0.9);
+
+      &:hover {
+        border: 1px solid rgba(0, 0, 0, 0.9) !important;
+      }
+    }
+
+    &:hover {
+      border: 1px solid rgba(0, 0, 0, 0.5);
+    }
   }
 
   &__months {
@@ -34,10 +58,50 @@
   }
 
   &__month {
-    color: $text;
+    color: var(--text);
   }
 
   &__weekday {
-    color: $text;
+    color: var(--text);
+  }
+}
+
+.info {
+  position: absolute;
+  top: -49px;
+  left: 50%;
+  z-index: 2;
+  min-width: 145px;
+  height: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  background-color: var(--dark);
+  border-radius: 3px;
+  padding: 6px 9px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    border: 10px solid transparent;
+    border-top: 10px solid var(--dark);
+    transform: translateX(-50%);
+  }
+
+  &__text {
+    color: var(--light);
+    line-height: calc(14.52px / 12px) * 100%;
+  }
+
+  &__date {
+    font-size: 10px;
+    line-height: calc(12.1px / 10px) * 100%;
+    color: var(--text);
   }
 }

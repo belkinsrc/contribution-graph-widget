@@ -5,8 +5,6 @@ const getClassName = block("graph");
 
 export class Graph {
 
-  static #NUMBER_OF_SQUARES = 357;
-
   render() {
     return `
       <article class="${getClassName()}">
@@ -18,15 +16,10 @@ export class Graph {
   }
 
   #getActivity() {
-    const convertToHTML = () => {
-      const squares = this.#createSquares(Graph.#NUMBER_OF_SQUARES);
-  
-      return squares.map(square => 
-        `<div class="${square.className}"></div>`).join("");
-    }
+    const weeks = Array.from({ length: 51 }, () => this.#createWeek()).join("");
     return `
       <div class="${getClassName("activity")}">
-        ${convertToHTML()}
+        ${weeks}    
       </div>
     `;
   }
@@ -34,8 +27,8 @@ export class Graph {
   #getMonths() {
     const convertToHTML = () => {
       const months = this.#createMonths();
-  
-      return months.map(month => 
+
+      return months.map(month =>
         `<div class="${getClassName("month")}">${month}</div>`).join("");
     }
     return `
@@ -48,8 +41,8 @@ export class Graph {
   #getWeekdays() {
     const convertToHTML = () => {
       const weekdays = this.#createWeekdays();
-  
-      return weekdays.map(weekday => 
+
+      return weekdays.map(weekday =>
         `<div class="${getClassName("weekday")}">${weekday}</div>`).join("");
     }
     return `
@@ -70,13 +63,27 @@ export class Graph {
   #createMonths() {
     return Array.from({ length: 12 }, (_, i) => format(new Date(1970, i), "MMM"));
   }
-  
+
+  #createWeek() {
+    const convertToHTML = () => {
+      const squares = this.#createSquares(7);
+
+      return squares.map(square =>
+        `<div class="${square.className}"></div>`
+      ).join("");
+    }
+    return `
+      <div class="${getClassName("week")}">
+        ${convertToHTML()}
+      </div>
+    `;
+  }
+
   #createWeekdays() {
     return [
       nextMonday(new Date()),
       nextWednesday(new Date()),
       nextFriday(new Date())
-    ]
-    .map(weekday => format(weekday, "EEE"));
+    ].map(weekday => format(weekday, "EEE"));
   }
 }

@@ -1,6 +1,16 @@
 import "../sass/main.scss";
+import { GraphModel } from "./model";
 import { Graph } from "./ui";
 
-const graph = new Graph();
+new Promise(resolve => {
+  const graph = new Graph();
+  document.querySelector("._page").innerHTML = graph.render();
+  resolve();
 
-document.querySelector("._page").innerHTML = graph.render();
+}).then(() => {
+  const graphModel = new GraphModel();
+  graphModel.run();
+})
+
+
+
