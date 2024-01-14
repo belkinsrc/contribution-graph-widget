@@ -1,5 +1,5 @@
-import { fetchContributionData } from "../api";
 import { format } from "date-fns";
+import { fetchContributionData } from "../api";
 
 export class GraphModel {
 
@@ -28,54 +28,25 @@ export class GraphModel {
   private setActivityLevel(squares: NodeListOf<HTMLDivElement>): void {
     const styles = getComputedStyle(document.documentElement);
 
+    const thresholds = [0, 1, 5, 10, 15];
+    const colorVariables = ["--level0", "--level1", "--level2", "--level3", "--level4"];
+
     squares.forEach(square => {
       const contribution = Number(square.dataset.contribution);
 
-      if (contribution === 0) {
-        square.style.backgroundColor = styles.getPropertyValue("--level0");
-      } else if (contribution >= 1 && contribution < 5) {
-        square.style.backgroundColor = styles.getPropertyValue("--level1");
-      } else if (contribution >= 5 && contribution < 10) {
-        square.style.backgroundColor = styles.getPropertyValue("--level2");
-      } else if (contribution >= 10 && contribution < 15) {
-        square.style.backgroundColor = styles.getPropertyValue("--level3");
-      } else if (contribution >= 15) {
-        square.style.backgroundColor = styles.getPropertyValue("--level4");
-      } else {
-        square.style.backgroundColor = styles.getPropertyValue("--level0");
-      }
-    })
+      const colorVariable = thresholds.reduce((acc, threshold, index) => {
+        return contribution >= threshold ? colorVariables[index] : acc;
+      }, colorVariables[0]);
+
+      square.style.backgroundColor = styles.getPropertyValue(colorVariable);
+    });
   }
 
   private selectSquare(): void {
-    document.addEventListener("click", event => {
-      const target = event.target as HTMLElement;
-  
-      if (!target.matches(".graph__square")) {
-        this.hideSelectedSquareInfo();
-      }
-    });
-
     const activity: HTMLDivElement = document.querySelector(".graph__activity")!;
-    
-    activity.addEventListener("click", event => {
-      const target = event.target as HTMLDivElement;
 
-      if (target && target.matches(".graph__square")) {
-
-        if (target.classList.contains("graph__square--selected")) {
-          return;
-        }
-
-        if (GraphModel.selectedSquare) {
-          GraphModel.selectedSquare.classList.remove("graph__square--selected");
-          GraphModel.selectedSquare.innerHTML = "";
-        }
-        target.classList.add("graph__square--selected");
-        GraphModel.selectedSquare = target;
-        this.showSquareInfo(target);
-      }
-    });
+    activity.addEventListener("click", this.handleSquareClick);
+    document.addEventListener("click", this.handleDocumentClick);
   }
 
   private showSquareInfo(parentNode: HTMLDivElement): void {
@@ -91,10 +62,37 @@ export class GraphModel {
   }
 
   private hideSelectedSquareInfo(): void {
-    if (GraphModel.selectedSquare) {
-      GraphModel.selectedSquare.classList.remove("graph__square--selected");
-      GraphModel.selectedSquare.innerHTML = "";
-      GraphModel.selectedSquare = null;
-    }
+    GraphModel.selectedSquare!.classList.remove("graph__square--selected");
+    GraphModel.selectedSquare!.innerHTML = "";
+    GraphModel.selectedSquare = null;
   }
+
+  private setSelectedSquare(square: HTMLDivElement): void {
+    if (square.classList.contains("graph__square--selected")) {
+      return;
+    }
+
+    if (GraphModel.selectedSquare) {
+      this.hideSelectedSquareInfo();
+    }
+    square.classList.add("graph__square--selected");
+    GraphModel.selectedSquare = square;
+    this.showSquareInfo(square);
+  }
+
+  private handleSquareClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLDivElement;
+
+    if (target && target.matches(".graph__square")) {
+      this.setSelectedSquare(target);
+    }
+  };
+
+  private handleDocumentClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement;
+
+    if (!target.matches(".graph__square") && GraphModel.selectedSquare) {
+      this.hideSelectedSquareInfo();
+    }
+  };
 }
