@@ -3,7 +3,7 @@ import { format } from "date-fns";
 
 export class GraphModel {
 
-  private static selectedSquare: HTMLDivElement;
+  private static selectedSquare: HTMLDivElement | null = null;
 
   run(): void {
     const squares: NodeListOf<HTMLDivElement> = document.querySelectorAll(".graph__square");
@@ -48,9 +48,17 @@ export class GraphModel {
   }
 
   private selectSquare(): void {
-    const activity: HTMLElement = document.querySelector(".graph__activity")!;
+    document.addEventListener("click", event => {
+      const target = event.target as HTMLElement;
+  
+      if (!target.matches(".graph__square")) {
+        this.hideSelectedSquareInfo();
+      }
+    });
 
-    activity.addEventListener("click", (event) => {
+    const activity: HTMLDivElement = document.querySelector(".graph__activity")!;
+    
+    activity.addEventListener("click", event => {
       const target = event.target as HTMLDivElement;
 
       if (target && target.matches(".graph__square")) {
@@ -65,12 +73,12 @@ export class GraphModel {
         }
         target.classList.add("graph__square--selected");
         GraphModel.selectedSquare = target;
-        this.createSquareInfo(target);
+        this.showSquareInfo(target);
       }
     });
   }
 
-  private createSquareInfo(parentNode: HTMLDivElement): void {
+  private showSquareInfo(parentNode: HTMLDivElement): void {
     const contributionCount = `${parentNode.dataset.contribution} contributions`;
     const currentDate = format(parentNode.dataset.date!, 'EEEE, MMMM dd, Y');
 
@@ -80,5 +88,13 @@ export class GraphModel {
         <p class="info__date">${currentDate}</p>
       </div>
     `;
+  }
+
+  private hideSelectedSquareInfo(): void {
+    if (GraphModel.selectedSquare) {
+      GraphModel.selectedSquare.classList.remove("graph__square--selected");
+      GraphModel.selectedSquare.innerHTML = "";
+      GraphModel.selectedSquare = null;
+    }
   }
 }
