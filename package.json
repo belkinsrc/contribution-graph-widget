@@ -6,14 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tsc": "tsc --noEmit --watch"
   },
   "devDependencies": {
     "sass": "^1.69.5",
-    "vite": "^5.0.8"
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "vite-plugin-checker": "^0.6.2"
   },
   "dependencies": {
-    "axios": "^1.6.3",
+    "axios": "^1.6.5",
     "bem-cn": "^3.0.1",
     "date-fns": "^3.0.6",
     "normalize.css": "^8.0.1"

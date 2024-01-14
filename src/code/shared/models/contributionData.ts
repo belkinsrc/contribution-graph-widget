@@ -1,0 +1,3 @@
+interface ContributionData {
+  string: number
+}

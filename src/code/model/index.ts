@@ -3,33 +3,34 @@ import { format } from "date-fns";
 
 export class GraphModel {
 
-  static selectedSquare;
+  private static selectedSquare: HTMLDivElement;
 
-  run() {
-    const squares = document.querySelectorAll(".graph__square");
+  run(): void {
+    const squares: NodeListOf<HTMLDivElement> = document.querySelectorAll(".graph__square");
 
     fetchContributionData()
       .then(data => {
-        this.#setDataAttributes(squares, data);
-        this.#setActivityLevel(squares);
-        this.#selectSquare();
+        this.setDataAttributes(squares, data);
+        this.setActivityLevel(squares);
+        this.selectSquare();
       })
   }
 
-  #setDataAttributes(squares, data) {
+  private setDataAttributes(squares: NodeListOf<HTMLDivElement>, data: ContributionData): void {
     squares.forEach((square, i) => {
-      const currentDateKey = Object.keys(data)[i];
-      const currentValueOfKey = data[currentDateKey];
+      const currentDateKey: string = Object.keys(data)[i];
+      const currentValueOfKey: number = data[currentDateKey as keyof ContributionData];
       square.dataset.date = currentDateKey;
-      square.dataset.contribution = currentValueOfKey;
+      square.dataset.contribution = currentValueOfKey.toString(); // ?
     })
   }
 
-  #setActivityLevel(squares) {
+  private setActivityLevel(squares: NodeListOf<HTMLDivElement>): void {
     const styles = getComputedStyle(document.documentElement);
 
     squares.forEach(square => {
-      const contribution = square.dataset.contribution;
+      const contribution = Number(square.dataset.contribution);
+
       if (contribution === 0) {
         square.style.backgroundColor = styles.getPropertyValue("--level0");
       } else if (contribution >= 1 && contribution < 5) {
@@ -44,30 +45,13 @@ export class GraphModel {
         square.style.backgroundColor = styles.getPropertyValue("--level0");
       }
     })
-
-    // const styles = getComputedStyle(document.documentElement);
-
-    // const contributionColors = {
-    //     0: "--level0",
-    //     1: "--level1",
-    //     5: "--level2",
-    //     10: "--level3",
-    //     15: "--level4"
-    // };
-
-    // squares.forEach(square => {
-    //     const contribution = parseInt(square.dataset.contribution) || 0;
-
-    //     let level = Object.keys(contributionColors).find(key => contribution >= key) || "--level0";
-    //     square.style.backgroundColor = styles.getPropertyValue(contributionColors[level]);
-    // });
   }
 
-  #selectSquare() {
-    const activity = document.querySelector(".graph__activity");
+  private selectSquare(): void {
+    const activity: HTMLElement = document.querySelector(".graph__activity")!;
 
     activity.addEventListener("click", (event) => {
-      const target = event.target;
+      const target = event.target as HTMLDivElement;
 
       if (target && target.matches(".graph__square")) {
 
@@ -81,14 +65,14 @@ export class GraphModel {
         }
         target.classList.add("graph__square--selected");
         GraphModel.selectedSquare = target;
-        this.#createSquareInfo(target);
+        this.createSquareInfo(target);
       }
     });
   }
 
-  #createSquareInfo(parentNode) {
+  private createSquareInfo(parentNode: HTMLDivElement): void {
     const contributionCount = `${parentNode.dataset.contribution} contributions`;
-    const currentDate = format(parentNode.dataset.date, 'EEEE, MMMM dd, Y');
+    const currentDate = format(parentNode.dataset.date!, 'EEEE, MMMM dd, Y');
 
     parentNode.innerHTML = `
       <div class="info">
